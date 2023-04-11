@@ -1,9 +1,43 @@
+import sys
 import unittest
-import LoggingApp
-import Exceptions
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 
-def get_default_credentials():
-    return "some@email.com", "some_password"
+from project import LoggingApp, WebApp, Exceptions
+
+
+class TestWebpage(unittest.TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())
+        self.driver.get('http://127.0.0.1:5000/')
+
+    def tearDown(self):
+        self.driver.quit()
+
+    def test_main_page_title_is_correct(self):
+        self.assertIn('Home Page', self.driver.title)
+
+    def test_main_page_navbar_with_Login_btn(self):
+        login_btn = self.driver.find_element(By.ID, "LogInBtn")
+        self.assertIsNotNone(login_btn)
+        self.assertIn("LogIn", login_btn.text)
+
+    def test_log_in_window_appears_with_email_and_password_boxes_in_login_container(self):
+        self.assertIsNotNone(self.driver.find_element(By.ID, "logInContainer"))
+
+        email_box_id, pass_box_id = "emailBox", "passwordBox"
+        email_box = self.driver.find_element(By.ID, pass_box_id)
+        password_box = self.driver.find_element(By.ID, pass_box_id)
+
+        self.assertFalse(email_box.is_displayed())
+        self.assertFalse(password_box.is_displayed())
+
+        self.driver.find_element(By.ID, "LogInBtn").click()
+
+        self.assertTrue(email_box.is_displayed())
+        self.assertTrue(password_box.is_displayed())
+
 
 class LoggingAppTest(unittest.TestCase):
 
@@ -47,3 +81,7 @@ class LoggingAppTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+def get_default_credentials():
+    return "some@email.com", "some_password"

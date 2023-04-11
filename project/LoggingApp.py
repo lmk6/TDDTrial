@@ -1,4 +1,4 @@
-import Exceptions
+import project.Exceptions as Exceptions
 
 
 class Application:
